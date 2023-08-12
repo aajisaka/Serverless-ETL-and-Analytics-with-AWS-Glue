@@ -16,8 +16,6 @@ Metadata:
         Label: 
           default: "AWS Glue Marketplace connections."
         Parameters: 
-          - HudiConnectionName
-          - DeltaLakeConnectionName
           - OpenSearchConnectionName
       - 
         Label: 
@@ -71,14 +69,6 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Description: Latest AMI ID of windows. You can keep the default value for this.
     Default: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
-
-  HudiConnectionName:
-    Description: The name of the AWS Glue Hudi Connection created in Glue Studio.
-    Type: String
-
-  DeltaLakeConnectionName:
-    Description: The name of the AWS Glue Delta Lake Connection created in Glue Studio.
-    Type: String    
 
   OpenSearchConnectionName:
     Description: The name of the AWS Glue OpenSearch Connection created in Glue Studio.
@@ -874,18 +864,18 @@ Resources:
         '--job-bookmark-option': job-bookmark-disable
         '--class': 'GlueApp'
         '--extra-jars': '/tmp/*'
+        '--datalake-formats': 'hudi'
       MaxRetries: 0
       Name: 10 - DeltaStreamer Kafka Consumer for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
         Connections:
-          - !Ref HudiConnectionName
           - !Ref GluePrivateResourcesConnection
       Tags:
         Project: HandsonSeriesWithAWSGlue
@@ -913,18 +903,18 @@ Resources:
         '--job-language': 'python'
         '--TARGET_BUCKET': !Ref TargetS3Bucket
         '--job-bookmark-option': job-bookmark-disable
+        '--datalake-formats': 'hudi'
       MaxRetries: 0
       Name: 09 - Kafka Consumer for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
         Connections:
-          - !Ref HudiConnectionName
           - !Ref GluePrivateResourcesConnection
       Tags:
         Project: HandsonSeriesWithAWSGlue
@@ -951,9 +941,9 @@ Resources:
         '--TARGET_BUCKET': !Ref TargetS3Bucket
       MaxRetries: 0
       Name: 01 - Seed data job for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
@@ -978,22 +968,19 @@ Resources:
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
         '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/DeltaLakeIncrementalLoadForDataAnalysisChapter"]]
-        '--extra-py-files': /tmp/delta-core_2.12-1.0.0.jar
         '--job-language': 'python'
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
+        '--datalake-formats': 'delta'
       MaxRetries: 0
       Name: 05 - DeltaLake Incremental load for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
         MaxConcurrentRuns: 1
-      Connections:
-        Connections:
-          - !Ref DeltaLakeConnectionName
       Tags:
         Project: HandsonSeriesWithAWSGlue
 
@@ -1014,78 +1001,15 @@ Resources:
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
         '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/DeltaLakeInitLoadForDataAnalysisChapter"]]
-        '--extra-py-files': /tmp/delta-core_2.12-1.0.0.jar
         '--job-language': 'python'
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
-        '--DELTALAKE_CONNECTION_NAME': !Ref DeltaLakeConnectionName
+        '--datalake-formats': 'delta'
       MaxRetries: 0
       Name: 04 - DeltaLake Init load for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
-      NumberOfWorkers: 2
-      Timeout: 2880
-      ExecutionProperty:
-        MaxConcurrentRuns: 1
-      Connections:
-        Connections:
-          - !Ref DeltaLakeConnectionName
-      Tags:
-        Project: HandsonSeriesWithAWSGlue
-
-  GovernedTableCreateTableForDataAnalysisChapterJob:
-    Type: AWS::Glue::Job
-    DependsOn:
-      - ScriptAndTempS3Bucket
-      - ExecuteGlueJobRole
-      - ReqdForGlueJobsToExecute
-    Properties:
-      Description: This job creates the Goverened table.
-      Command:
-        Name: pythonshell
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Governed Table Create Table for Data Analysis Chapter.py"]]
-        PythonVersion: 3
-      DefaultArguments:
-        '--job-bookmark-option': job-bookmark-disable
-        '--job-language': 'python'
-        '--TARGET_BUCKET': !Ref TargetS3Bucket
-      MaxRetries: 0
-      Name: 06 - Governed Table Create Table for Data Analysis Chapter
-      GlueVersion: 1.0
-      Role: !GetAtt ExecuteGlueJobRole.Arn
-      MaxCapacity: 0.0625
-      Timeout: 2880
-      ExecutionProperty:
-        MaxConcurrentRuns: 1
-      Tags:
-        Project: HandsonSeriesWithAWSGlue
-
-  GovernedTableInitLoadForDataAnalysisChapterJob:
-    Type: AWS::Glue::Job
-    DependsOn:
-      - ScriptAndTempS3Bucket
-      - ExecuteGlueJobRole
-      - ReqdForGlueJobsToExecute
-    Properties:
-      Description: This job processes initial load data for Governed table.
-      Command:
-        Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Governed Table Init Load for Data Analysis Chapter.py"]]
-        PythonVersion: 3
-      DefaultArguments:
-        '--enable-glue-datacatalog': ''
-        '--enable-continuous-cloudwatch-log': 'true'
-        '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/GovernedTableInitLoadForDataAnalysisChapter"]]
-        '--job-language': 'python'
-        '--job-bookmark-option': job-bookmark-disable
-        '--TARGET_BUCKET': !Ref TargetS3Bucket
-      MaxRetries: 0
-      Name: 07 - Governed Table Init Load for Data Analysis Chapter
-      GlueVersion: 3.0
-      Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
@@ -1113,18 +1037,16 @@ Resources:
         '--job-language': 'python'
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
+        '--datalake-formats': 'hudi'
       MaxRetries: 0
       Name: 03 - Hudi Incremental load for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
         MaxConcurrentRuns: 1
-      Connections:
-        Connections:
-          - !Ref HudiConnectionName
       Tags:
         Project: HandsonSeriesWithAWSGlue
 
@@ -1148,18 +1070,16 @@ Resources:
         '--job-language': 'python'
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
+        '--datalake-formats': 'hudi'
       MaxRetries: 0
       Name: 02 - Hudi Init load for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: 4.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
         MaxConcurrentRuns: 1
-      Connections:
-        Connections:
-          - !Ref HudiConnectionName
       Tags:
         Project: HandsonSeriesWithAWSGlue
 
@@ -1251,7 +1171,7 @@ Resources:
       Name: 12 - OpenSearch Load for Data Analysis Chapter
       GlueVersion: 3.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: Standard
+      WorkerType: 'G.1X'
       NumberOfWorkers: 2
       Timeout: 2880
       ExecutionProperty:
@@ -1591,10 +1511,6 @@ Outputs:
   ChapterDataAnalysisSecurityGroup:
     Description: The Security Group Id to be used while creating the Glue MSK Connection and Serverless Redshift.
     Value: !Ref ChapterDataAnalysisSecurityGroup
-
-  LakeFormationLocationForRegistry:
-    Description: The location to be registered in LakeFormation for LakeFormation Governed Tables.
-    Value: !Join ['', ["s3://", !Ref TargetS3Bucket, "/employees_governed_table/"]]    
 
   RedshiftClusterId:
     Description: The id of the Redshift cluster. This will be required to select the correct cluster to connect.
