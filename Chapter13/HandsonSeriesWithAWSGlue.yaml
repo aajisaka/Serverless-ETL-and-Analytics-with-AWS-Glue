@@ -1460,7 +1460,7 @@ Resources:
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
       MasterUsername: !Ref RedshiftMasterUserName
       MasterUserPassword: !Ref RedshiftMasterUserPassword
-      NodeType: ds2.xlarge
+      NodeType: dc2.large
       PubliclyAccessible: false
       Tags:
         -
