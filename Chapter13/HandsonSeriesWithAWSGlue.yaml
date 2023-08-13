@@ -170,7 +170,7 @@ Resources:
     DependsOn:
       - VPC     
     Properties:
-      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      AvailabilityZone: !Select [ 2, !GetAZs  '' ]
       CidrBlock: !Ref PrivateSubnet2CIDR
       MapPublicIpOnLaunch: false
       VpcId: !Ref VPC      
