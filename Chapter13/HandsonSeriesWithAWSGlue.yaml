@@ -835,7 +835,7 @@ Resources:
       CatalogId: !Ref AWS::AccountId
       DatabaseInput: 
         Description: All tables in this chapter will be created within this database.
-        Name: chapter-data-analysis-glue-database
+        Name: chapter_data_analysis_glue_database
         LocationUri: !Join ['', ["s3://", !Ref TargetS3Bucket, "/"]]
 
   DeltaStreamerStreamingJob:

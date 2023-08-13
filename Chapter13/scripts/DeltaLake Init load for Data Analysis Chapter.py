@@ -18,7 +18,7 @@ glueContext = GlueContext(sc)
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 tableLocation = 's3://'+args['TARGET_BUCKET']+'/deltalake_employees/'
-inputDyf = glueContext.create_dynamic_frame_from_catalog(database='chapter-data-analysis-glue-database', table_name='employees')
+inputDyf = glueContext.create_dynamic_frame_from_catalog(database='chapter_data_analysis_glue_database', table_name='employees')
 
 commonConfig = {"path": tableLocation,"connectionName":args['DELTALAKE_CONNECTION_NAME']}
 
@@ -27,6 +27,6 @@ glueContext.write_dynamic_frame.from_options(frame=inputDyf, connection_type="ma
 deltaTable = DeltaTable.forPath(spark, tableLocation)
 deltaTable.generate("symlink_format_manifest")
 
-spark.sql("CREATE TABLE `chapter-data-analysis-glue-database`.employees_deltalake (emp_no int, name string, department string, city string, salary int) ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' LOCATION '"+tableLocation+"_symlink_format_manifest/'")
+spark.sql("CREATE TABLE `chapter_data_analysis_glue_database`.employees_deltalake (emp_no int, name string, department string, city string, salary int) ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' LOCATION '"+tableLocation+"_symlink_format_manifest/'")
 
 job.commit()

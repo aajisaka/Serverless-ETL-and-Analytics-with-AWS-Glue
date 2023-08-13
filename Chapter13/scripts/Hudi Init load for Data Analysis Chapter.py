@@ -17,14 +17,14 @@ glueContext = GlueContext(sc)
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-inputDf = glueContext.create_dynamic_frame_from_catalog(database='chapter-data-analysis-glue-database', table_name='employees').toDF().withColumn('ts', lit(datetime.now()))
+inputDf = glueContext.create_dynamic_frame_from_catalog(database='chapter_data_analysis_glue_database', table_name='employees').toDF().withColumn('ts', lit(datetime.now()))
 
 commonConfig = {'className': 'org.apache.hudi',
                 'hoodie.datasource.hive_sync.use_jdbc': 'false',
                 'hoodie.datasource.write.recordkey.field': 'emp_no',
                 'hoodie.table.name': 'employees_cow',
                 'hoodie.consistency.check.enabled': 'true',
-                'hoodie.datasource.hive_sync.database': 'chapter-data-analysis-glue-database',
+                'hoodie.datasource.hive_sync.database': 'chapter_data_analysis_glue_database',
                 'hoodie.datasource.hive_sync.table': 'employees_cow',
                 'hoodie.datasource.hive_sync.enable': 'true',
                 'path': 's3://'+args['TARGET_BUCKET']+'/hudi/employees_cow_data'}

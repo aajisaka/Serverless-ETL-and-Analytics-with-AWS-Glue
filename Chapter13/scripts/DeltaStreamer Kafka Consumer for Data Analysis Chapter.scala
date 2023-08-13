@@ -38,7 +38,7 @@ object GlueApp {
         "--hoodie-conf", "hoodie.deltastreamer.schemaprovider.target.schema.file=s3://" + args("CONFIG_BUCKET") + "/HandsonSeriesWithAWSGlue/config/employees.avsc", 
         "--hoodie-conf", "hoodie.deltastreamer.source.kafka.topic=chapter-data-analysis", 
         "--hoodie-conf", "hoodie.datasource.hive_sync.table=employees_deltastreamer",
-      "--hoodie-conf", "hoodie.datasource.hive_sync.database=chapter-data-analysis-glue-database",
+      "--hoodie-conf", "hoodie.datasource.hive_sync.database=chapter_data_analysis_glue_database",
         "--hoodie-conf", "hoodie.datasource.write.recordkey.field=emp_no", 
         "--hoodie-conf", "hoodie.datasource.hive_sync.use_jdbc=false",
     "--hoodie-conf", "hoodie.datasource.hive_sync.partition_extractor_class=org.apache.hudi.hive.NonPartitionedExtractor",

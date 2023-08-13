@@ -14,7 +14,7 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-inputDyf = glueContext.create_dynamic_frame_from_catalog(database='chapter-data-analysis-glue-database', table_name='employees')#.toDF()
+inputDyf = glueContext.create_dynamic_frame_from_catalog(database='chapter_data_analysis_glue_database', table_name='employees')#.toDF()
 
 glueContext.write_dynamic_frame.from_options( frame=inputDyf, connection_type="marketplace.spark",
     connection_options={

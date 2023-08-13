@@ -42,7 +42,7 @@ employees_dyf = DynamicFrame.fromDF(employees_df, glueContext, "employees_dyf")
 sink = glueContext.getSink(connection_type="s3", path="s3://"+args['TARGET_BUCKET']+"/seed_data/employees",
     enableUpdateCatalog=True, updateBehavior="UPDATE_IN_DATABASE")
 sink.setFormat("glueparquet")
-sink.setCatalogInfo(catalogDatabase='chapter-data-analysis-glue-database', catalogTableName='employees')
+sink.setCatalogInfo(catalogDatabase='chapter_data_analysis_glue_database', catalogTableName='employees')
 sink.writeFrame(employees_dyf)
 
 job.commit()
