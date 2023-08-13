@@ -17,10 +17,11 @@ glueContext = GlueContext(sc)
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-inputDf = glueContext.create_dynamic_frame_from_catalog(database='chapter_data_analysis_glue_database', table_name='employees').toDF().withColumn('ts', lit(datetime.now()))
+inputDf = glueContext.create_data_frame.from_catalog(
+    database='chapter_data_analysis_glue_database',
+    table_name='employees').withColumn('ts', lit(datetime.now()))
 
-commonConfig = {'className': 'org.apache.hudi',
-                'hoodie.datasource.hive_sync.use_jdbc': 'false',
+commonConfig = {'hoodie.datasource.hive_sync.use_jdbc': 'false',
                 'hoodie.datasource.write.recordkey.field': 'emp_no',
                 'hoodie.table.name': 'employees_cow',
                 'hoodie.consistency.check.enabled': 'true',
@@ -36,5 +37,8 @@ initLoadConfig = {'hoodie.bulkinsert.shuffle.parallelism': 3,
                   'hoodie.datasource.write.operation': 'bulk_insert'}
 
 combinedConf = {**commonConfig, **unpartitionDataConfig, **initLoadConfig}
-glueContext.write_dynamic_frame.from_options(frame=DynamicFrame.fromDF(inputDf, glueContext, "inputDf"), connection_type="marketplace.spark", connection_options=combinedConf)
 
+inputDf.write.format('hudi') \
+  .options(combinedConf) \
+  .mode('overwrite') \
+  .save()

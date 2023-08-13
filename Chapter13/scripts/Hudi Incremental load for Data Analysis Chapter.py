@@ -23,8 +23,7 @@ updated_data = [ [3, 'Jeff', 'Finance', ' Cincinnati', 75000] ]
 
 updated_df = spark.createDataFrame(updated_data, schema = employees_schema).withColumn('ts', lit(datetime.now()))
 
-commonConfig = {'className': 'org.apache.hudi',
-                'hoodie.datasource.hive_sync.use_jdbc': 'false',
+commonConfig = {'hoodie.datasource.hive_sync.use_jdbc': 'false',
                 'hoodie.datasource.write.recordkey.field': 'emp_no',
                 'hoodie.table.name': 'employees_cow',
                 'hoodie.consistency.check.enabled': 'true',
@@ -42,6 +41,9 @@ incrementalConfig = {
     'hoodie.cleaner.commits.retained': 3}
 
 combinedConf = {**commonConfig, **unpartitionDataConfig, **incrementalConfig }
-glueContext.write_dynamic_frame.from_options(frame=DynamicFrame.fromDF(updated_df, glueContext, "updated_df"), connection_type="marketplace.spark", connection_options=combinedConf)
+update_df.write.format('hudi') \
+  .options(combinedConf) \
+  .mode('overwrite') \
+  .save()
 
 job.commit()

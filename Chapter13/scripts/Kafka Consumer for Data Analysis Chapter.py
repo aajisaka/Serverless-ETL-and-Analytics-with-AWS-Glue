@@ -33,12 +33,11 @@ def processBatch(data_frame, batchId):
         constructed_df = data_frame.select(from_json("value", schema=employees_schema).alias('data')).select('data.*')
         final_df = constructed_df.withColumn("record_creation_time", from_unixtime(constructed_df.record_creation_time,"yyyy-MM-dd HH:mm:ss:SSS"))
         # Write to S3 Sink
-        commonConfig = {'className' : 'org.apache.hudi', 'hoodie.datasource.hive_sync.use_jdbc':'false', 'hoodie.datasource.write.precombine.field': 'record_creation_time', 'hoodie.datasource.write.recordkey.field': 'emp_no', 'hoodie.table.name': 'employees_cow_streaming', 'hoodie.consistency.check.enabled': 'true', 'hoodie.datasource.hive_sync.database': 'chapter_data_analysis_glue_database', 'hoodie.datasource.hive_sync.table': 'employees_cow_streaming', 'hoodie.datasource.hive_sync.enable': 'true', 'path': 's3://'+args['TARGET_BUCKET']+'/hudi/employees_cow_streaming'}
+        commonConfig = {'hoodie.datasource.hive_sync.use_jdbc':'false', 'hoodie.datasource.write.precombine.field': 'record_creation_time', 'hoodie.datasource.write.recordkey.field': 'emp_no', 'hoodie.table.name': 'employees_cow_streaming', 'hoodie.consistency.check.enabled': 'true', 'hoodie.datasource.hive_sync.database': 'chapter_data_analysis_glue_database', 'hoodie.datasource.hive_sync.table': 'employees_cow_streaming', 'hoodie.datasource.hive_sync.enable': 'true', 'path': 's3://'+args['TARGET_BUCKET']+'/hudi/employees_cow_streaming'}
         unpartitionDataConfig = {'hoodie.datasource.hive_sync.partition_extractor_class': 'org.apache.hudi.hive.NonPartitionedExtractor', 'hoodie.datasource.write.keygenerator.class': 'org.apache.hudi.keygen.NonpartitionedKeyGenerator'}
         incrementalConfig = {'hoodie.upsert.shuffle.parallelism': 3, 'hoodie.datasource.write.operation': 'upsert', 'hoodie.cleaner.policy': 'KEEP_LATEST_COMMITS', 'hoodie.cleaner.commits.retained': 10}
         combinedConf = {**commonConfig, **unpartitionDataConfig, **incrementalConfig}
-        glueContext.write_dynamic_frame.from_options(frame = DynamicFrame.fromDF(final_df, glueContext, "final_df"), connection_type = "marketplace.spark", connection_options = combinedConf)
-
+        final_df.write.format('hudi').mode('overwrite').save()
     
 source_kafka_streaming_df = glueContext.create_data_frame.from_options(
     connection_type="kafka",

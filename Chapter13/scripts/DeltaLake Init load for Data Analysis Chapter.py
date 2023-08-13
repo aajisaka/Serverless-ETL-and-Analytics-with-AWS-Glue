@@ -18,11 +18,11 @@ glueContext = GlueContext(sc)
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 tableLocation = 's3://'+args['TARGET_BUCKET']+'/deltalake_employees/'
-inputDyf = glueContext.create_dynamic_frame_from_catalog(database='chapter_data_analysis_glue_database', table_name='employees')
+inputDf = glueContext.create_data_frame.from_catalog(database='chapter_data_analysis_glue_database', table_name='employees')
 
-commonConfig = {"path": tableLocation,"connectionName":args['DELTALAKE_CONNECTION_NAME']}
-
-glueContext.write_dynamic_frame.from_options(frame=inputDyf, connection_type="marketplace.spark", connection_options=commonConfig)
+inputDf.write.format('delta') \
+  .mode('append') \
+  .save(tableLocation)
 
 deltaTable = DeltaTable.forPath(spark, tableLocation)
 deltaTable.generate("symlink_format_manifest")
