@@ -3,14 +3,11 @@ from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from awsglue.context import GlueContext
 from awsglue.job import Job
-from awsglue.dynamicframe import DynamicFrame
-from pyspark.sql.functions import col, to_timestamp, monotonically_increasing_id, to_date, when, lit
 from awsglue.utils import getResolvedOptions
 from pyspark.sql.types import *
-from datetime import datetime
 from delta.tables import *
 
-args = getResolvedOptions(sys.argv, ['JOB_NAME','TARGET_BUCKET','DELTALAKE_CONNECTION_NAME'])
+args = getResolvedOptions(sys.argv, ['JOB_NAME','TARGET_BUCKET'])
 
 spark = SparkSession.builder.config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension").config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog").getOrCreate()
 sc = spark.sparkContext
