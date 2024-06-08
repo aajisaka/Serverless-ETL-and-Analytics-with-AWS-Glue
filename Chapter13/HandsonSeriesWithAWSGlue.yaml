@@ -1,32 +1,25 @@
-Description:  This template deploys various components for Data Analysis chapter of the Hands-on series with AWS Glue. 
+Description: This template deploys various components for Data Analysis chapter
+  of the Hands-on series with AWS Glue.
 
-Metadata: 
-  AWS::CloudFormation::Interface: 
-    ParameterGroups: 
-      - 
-        Label: 
-          default: "Network Configuration."
-        Parameters: 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Network Configuration.
+        Parameters:
           - VpcCIDR
           - PrivateSubnet1CIDR
           - PrivateSubnet2CIDR
           - PublicSubnetCIDR
           - ClientIPCIDR
-      - 
-        Label: 
-          default: "AWS Glue Marketplace connections."
-        Parameters: 
-          - OpenSearchConnectionName
-      - 
-        Label: 
-          default: "Amazon Redshift credentials information."
-        Parameters: 
+      - Label:
+          default: Amazon Redshift credentials information.
+        Parameters:
           - RedshiftMasterUserName
           - RedshiftMasterUserPassword
-      - 
-        Label: 
-          default: "OpenSearch credentials information."
-        Parameters: 
+      - Label:
+          default: OpenSearch credentials information.
+        Parameters:
           - OpenSearchMasterUserName
           - OpenSearchMasterUserPassword
 
@@ -36,75 +29,84 @@ Parameters:
     Description: The IP range (CIDR notation) for this VPC
     Type: String
     Default: 10.0.0.0/16
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x
 
   PrivateSubnet1CIDR:
-    Description: The IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Description: The IP range (CIDR notation) for the private subnet in the first
+      Availability Zone
     Type: String
     Default: 10.0.10.0/24
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x
-    
+
   PrivateSubnet2CIDR:
-    Description: The IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Description: The IP range (CIDR notation) for the private subnet in the second
+      Availability Zone
     Type: String
     Default: 10.0.20.0/24
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x
 
   PublicSubnetCIDR:
-    Description: The IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Description: The IP range (CIDR notation) for the public subnet in the first
+      Availability Zone
     Type: String
     Default: 10.0.30.0/24
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Description: The KeyPair to be used in your EC2 instance. This EC2 instance will be used as a proxy to connect from your SQL client to Aurora postgres source database.
+    Description: The KeyPair to be used in your EC2 instance. This EC2 instance will
+      be used as a proxy to connect from your SQL client to Aurora postgres
+      source database.
     ConstraintDescription: Please select a key to be used to login to the EC2 instance
-    
+
   EC2ImageId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Description: Latest AMI ID of windows. You can keep the default value for this.
     Default: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
 
-  OpenSearchConnectionName:
-    Description: The name of the AWS Glue OpenSearch Connection created in Glue Studio.
-    Type: String  
-
   RedshiftMasterUserName:
     Description: The master user name for the Redshift cluster.
-    Type: String 
+    Type: String
 
   RedshiftMasterUserPassword:
-    Description: The master user password for the Redshift cluster. Must have atleast 8 characters, one upper case, one lower case and one number. Special characters are not allowed.
+    Description: The master user password for the Redshift cluster. Must have
+      atleast 8 characters, one upper case, one lower case and one number.
+      Special characters are not allowed.
     Type: String
-    AllowedPattern: '^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{8,}$'
-    ConstraintDescription: Must have atleast 8 characters, one upper case, one lower case and one number. Special characters are not allowed.    
+    AllowedPattern: ^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{8,}$
+    ConstraintDescription: Must have atleast 8 characters, one upper case, one lower
+      case and one number. Special characters are not allowed.
     NoEcho: true
-    MinLength: 8
-    MaxLength: 64
+    MinLength: '8'
+    MaxLength: '64'
 
   OpenSearchMasterUserName:
     Description: The master user name for the OpenSearch cluster.
-    Type: String 
+    Type: String
 
   OpenSearchMasterUserPassword:
-    Description: "The master user password for the OpenSearch cluster. Must have atleast 8 characters, one upper case, one lower case and one number and one of #$! special characters."
+    Description: 'The master user password for the OpenSearch cluster. Must have
+      atleast 8 characters, one upper case, one lower case and one number and
+      one of #$! special characters.'
     Type: String
     NoEcho: true
-    AllowedPattern: '^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[#$!])[A-Za-z0-9#$!]{8,}$'
-    ConstraintDescription: "Must have atleast 8 characters, one upper case, one lower case and one number and one of #$! special characters."
-    MinLength: 8
-    MaxLength: 64
+    AllowedPattern: ^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[#$!])[A-Za-z0-9#$!]{8,}$
+    ConstraintDescription: 'Must have atleast 8 characters, one upper case, one
+      lower case and one number and one of #$! special characters.'
+    MinLength: '8'
+    MaxLength: '64'
 
   ClientIPCIDR:
     Type: String
-    Description: The IP Address of your Client that will be used to connect to the Kafka cluster. On Mac, you can run the following command to get your IP in CIDR notation using - curl ipecho.net/plain ; echo /32
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
-    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x   
+    Description: The IP Address of your Client that will be used to connect to the
+      Kafka cluster. On Mac, you can run the following command to get your IP in
+      CIDR notation using - curl ipecho.net/plain ; echo /32
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x
 
 Resources:
 
@@ -115,90 +117,83 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
-        -
-          Key: Project
-          Value: HandsonSeriesWithAWSGlue  
-      
+        - Key: Project
+          Value: HandsonSeriesWithAWSGlue
+
   VPCInternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     DependsOn:
       - InternetGateway
-      - VPC      
+      - VPC
     Properties:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
-      
+
   PublicSubnet:
     Type: AWS::EC2::Subnet
     DependsOn:
-      - VPC    
+      - VPC
     Properties:
       AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: !Ref PublicSubnetCIDR
       MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
-        
+
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     DependsOn:
       - VPC
       - PrivateRouteTable
     Properties:
-      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: !Ref PrivateSubnet1CIDR
       MapPublicIpOnLaunch: false
-      VpcId: !Ref VPC      
+      VpcId: !Ref VPC
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
-        
+
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
     DependsOn:
-      - VPC     
+      - VPC
     Properties:
-      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      AvailabilityZone: !Select [1, !GetAZs '']
       CidrBlock: !Ref PrivateSubnet2CIDR
       MapPublicIpOnLaunch: false
-      VpcId: !Ref VPC      
+      VpcId: !Ref VPC
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     DependsOn:
-      - VPC    
+      - VPC
     Properties:
       VpcId: !Ref VPC
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
-        
+
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     DependsOn:
-      - VPC    
+      - VPC
     Properties:
       VpcId: !Ref VPC
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   NatGatewayEIP:
@@ -211,11 +206,11 @@ Resources:
     Type: AWS::EC2::NatGateway
     DependsOn:
       - NatGatewayEIP
-      - PublicSubnet    
+      - PublicSubnet
     Properties:
       AllocationId: !GetAtt NatGatewayEIP.AllocationId
       SubnetId: !Ref PublicSubnet
-      
+
   PrivateSubnetRouteTableAssociation1:
     Type: AWS::EC2::SubnetRouteTableAssociation
     DependsOn:
@@ -238,16 +233,16 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     DependsOn:
       - PublicRouteTable
-      - PublicSubnet    
+      - PublicSubnet
     Properties:
-      RouteTableId: !Ref PublicRouteTable    
+      RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet
-        
+
   PublicInternetRoute:
     Type: AWS::EC2::Route
     DependsOn:
       - PublicRouteTable
-      - InternetGateway 
+      - InternetGateway
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
@@ -257,25 +252,24 @@ Resources:
     Type: AWS::EC2::Route
     DependsOn:
       - PrivateRouteTable
-      - NatGateway     
+      - NatGateway
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway
-      
+
   ChapterDataAnalysisSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     DependsOn:
-      - VPC    
+      - VPC
     Properties:
       GroupName: chapter-data-analysis-sg
       GroupDescription: Security group to protect Data Analysis Chapter resources.
       VpcId: !Ref VPC
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
-        
+
   SelfRefSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     DependsOn: ChapterDataAnalysisSecurityGroup
@@ -296,7 +290,8 @@ Resources:
       IpProtocol: tcp
       FromPort: 3389
       ToPort: 3389
-      Description: Rule to allow Remote desktop connection from your laptop. This will help us view the OpenSearch Dashboards hosted in a private subnet.
+      Description: Rule to allow Remote desktop connection from your laptop. This will
+        help us view the OpenSearch Dashboards hosted in a private subnet.
       CidrIp: !Ref ClientIPCIDR
 
   SelfRefSecurityGroupEgress:
@@ -313,20 +308,20 @@ Resources:
   SecurityGroupEgress443:
     Type: AWS::EC2::SecurityGroupEgress
     DependsOn: ChapterDataAnalysisSecurityGroup
-    Properties: 
+    Properties:
       Description: Egress to install yum packages
-      CidrIp: "0.0.0.0/0"
+      CidrIp: 0.0.0.0/0
       FromPort: 443
       GroupId: !Ref ChapterDataAnalysisSecurityGroup
       IpProtocol: tcp
       ToPort: 443
-  
+
   SecurityGroupEgress80:
     Type: AWS::EC2::SecurityGroupEgress
     DependsOn: ChapterDataAnalysisSecurityGroup
-    Properties: 
+    Properties:
       Description: Egress to install yum packages
-      CidrIp: "0.0.0.0/0"
+      CidrIp: 0.0.0.0/0
       FromPort: 80
       GroupId: !Ref ChapterDataAnalysisSecurityGroup
       IpProtocol: tcp
@@ -335,7 +330,7 @@ Resources:
   SecurityGroupEgress5432:
     Type: AWS::EC2::SecurityGroupEgress
     DependsOn: ChapterDataAnalysisSecurityGroup
-    Properties: 
+    Properties:
       Description: Kafka Connectivity
       CidrIp: !Ref VpcCIDR
       FromPort: 9094
@@ -345,32 +340,30 @@ Resources:
 
   TargetS3Bucket:
     Type: AWS::S3::Bucket
-    DependsOn: KMSEncryptionKey    
+    DependsOn: KMSEncryptionKey
     DeletionPolicy: Delete
     Properties:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
-              KMSMasterKeyID: !GetAtt KMSEncryptionKey.Arn      
+              KMSMasterKeyID: !GetAtt KMSEncryptionKey.Arn
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ScriptAndTempS3Bucket:
     Type: AWS::S3::Bucket
-    DependsOn: KMSEncryptionKey    
+    DependsOn: KMSEncryptionKey
     DeletionPolicy: Delete
     Properties:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
-              KMSMasterKeyID: !GetAtt KMSEncryptionKey.Arn  
+              KMSMasterKeyID: !GetAtt KMSEncryptionKey.Arn
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   S3VPCEndpoint:
@@ -384,8 +377,7 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - 
-            Principal: "*"
+          - Principal: '*'
             Effect: Allow
             Action:
               - s3:PutObject
@@ -393,21 +385,20 @@ Resources:
               - s3:ListBucket
               - s3:DeleteObject
             Resource:
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket, "/*"]]
-              - !Join ['', ["arn:aws:s3:::", !Ref ScriptAndTempS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref ScriptAndTempS3Bucket, "/*"]]
-          - 
-            Principal: "*"
+              - !Sub arn:aws:s3:::${TargetS3Bucket}
+              - !Sub arn:aws:s3:::${TargetS3Bucket}/*
+              - !Sub arn:aws:s3:::${ScriptAndTempS3Bucket}
+              - !Sub arn:aws:s3:::${ScriptAndTempS3Bucket}/*
+          - Principal: '*'
             Effect: Allow
             Action:
               - s3:Get*
             Resource:
-              - !Join ['', ["arn:aws:s3:::prod-", !Ref AWS::Region, "-starport-layer-bucket/*"]]              
+              - !Sub arn:aws:s3:::prod-${AWS::Region}-starport-layer-bucket/*'
       RouteTableIds:
         - !Ref PrivateRouteTable
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
-      VpcId: !Ref VPC      
+      VpcId: !Ref VPC
 
   RSAccessRole:
     Type: AWS::IAM::Role
@@ -424,8 +415,7 @@ Resources:
               - sts:AssumeRole
       Path: /
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ReqdForRSToAccessGlueCatalog:
@@ -437,8 +427,7 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - glue:GetDatabase
               - glue:GetPartition
@@ -448,14 +437,13 @@ Resources:
               - glue:GetTables
               - glue:GetTable
             Resource: '*'
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - s3:GetObject
               - s3:ListBucket
             Resource:
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket, "/*"]]              
+              - !Sub arn:aws:s3:::${TargetS3Bucket}
+              - !Sub arn:aws:s3:::${TargetS3Bucket}/*
       Roles:
         - HandsonSeriesWithAWSGlueRSRole
 
@@ -476,8 +464,7 @@ Resources:
               - sts:AssumeRole
       Path: /
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ReqdForGlueJobsToExecute:
@@ -491,8 +478,7 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - glue:Batch*
               - glue:Update*
@@ -503,16 +489,14 @@ Resources:
               - glue:Untag*
               - glue:Tag*
             Resource: '*'
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - logs:CreateLogGroup
               - logs:CreateLogStream
               - logs:PutLogEvents
               - logs:AssociateKmsKey
-            Resource: arn:aws:logs:*:*:/aws-glue/*         
-          - 
-            Effect: Allow
+            Resource: arn:aws:logs:*:*:/aws-glue/*
+          - Effect: Allow
             Action:
               - ec2:DescribeVpcEndpoints
               - ec2:DescribeRouteTables
@@ -525,18 +509,15 @@ Resources:
               - ec2:CreateNetworkInterface
               - ec2:DeleteNetworkInterface
             Resource: '*'
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - cloudwatch:PutMetricData
             Resource: '*'
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - iam:GetRole
             Resource: '*'
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - s3:GetBucketLocation
               - s3:ListBucket
@@ -545,39 +526,23 @@ Resources:
               - s3:PutObject
               - s3:DeleteObject
             Resource:
-              - !Join ['', ["arn:aws:s3:::", !Ref ScriptAndTempS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref ScriptAndTempS3Bucket, "/*"]]  
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket, "/*"]]                           
-          - 
-            Effect: Allow
-            Action:
-              - lakeformation:UpdateTableStorageOptimizer
-              - lakeformation:StartQueryPlanning
-              - lakeformation:GetDataAccess
-              - lakeformation:DeleteObjectsOnCancel
-              - lakeformation:CommitTransaction
-              - lakeformation:CancelTransaction
-              - lakeformation:ExtendTransaction
-              - lakeformation:StartTransaction
-              - lakeformation:UpdateTableObjects
-            Resource: '*'     
-          - 
-            Effect: Allow
-            Action:
-              - secretsmanager:GetSecretValue
-              - secretsmanager:DescribeSecret
-              - secretsmanager:ListSecrets
-            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:ChapterDataAnalysisOSSecret*          
-          - 
-            Effect: Allow
+              - !Sub arn:aws:s3:::${ScriptAndTempS3Bucket}
+              - !Sub arn:aws:s3:::${ScriptAndTempS3Bucket}/*
+              - !Sub arn:aws:s3:::${TargetS3Bucket}
+              - !Sub arn:aws:s3:::${TargetS3Bucket}/*
+          - Effect: Allow
             Action:
               - secretsmanager:GetSecretValue
               - secretsmanager:DescribeSecret
               - secretsmanager:ListSecrets
             Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:ChapterDataAnalysisOSSecret*
-          -
-            Effect: Allow
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+              - secretsmanager:ListSecrets
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:ChapterDataAnalysisOSSecret*
+          - Effect: Allow
             Action:
               - kms:Encrypt
               - kms:Decrypt
@@ -608,8 +573,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ReqdToTriggerLambdaFns:
@@ -623,47 +587,41 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - glue:DeleteTable
               - glue:Get*
               - glue:BatchStopJobRun
             Resource: '*'
-          - 
-            Effect: Allow
+          - Effect: Allow
             Action:
               - ec2:DetachNetworkInterface
               - ec2:DescribeNetworkInterfaces
               - ec2:DeleteNetworkInterface
             Resource: '*'
-          -
-            Effect: Allow
-            Action: 
+          - Effect: Allow
+            Action:
               - logs:*
             Resource:
               - !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/InvokeHandsonSeriesWithAWSGlueStarterTasks
               - !Sub arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/InvokeHandsonSeriesWithAWSGlueStarterTasks:log-stream:*
-          -
-            Effect: Allow
+          - Effect: Allow
             Action:
               - s3:*
             Resource:
-              - !Join ['', ["arn:aws:s3:::", !Ref ScriptAndTempS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref ScriptAndTempS3Bucket, "/*"]]  
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket]]
-              - !Join ['', ["arn:aws:s3:::", !Ref TargetS3Bucket, "/*"]]         
-          -
-            Effect: Allow
+              - !Sub arn:aws:s3:::${ScriptAndTempS3Bucket}
+              - !Sub arn:aws:s3:::${ScriptAndTempS3Bucket}/*
+              - !Sub arn:aws:s3:::${TargetS3Bucket}
+              - !Sub arn:aws:s3:::${TargetS3Bucket}/*
+          - Effect: Allow
             Action:
-                - s3:GetObject
-                - s3:ListObjects
-                - s3:ListBucket
+              - s3:GetObject
+              - s3:ListObjects
+              - s3:ListBucket
             Resource:
-                - arn:aws:s3:::packt-serverless-etl-glue
-                - arn:aws:s3:::packt-serverless-etl-glue/HandsonSeriesWithAWSGlue/*
-          - 
-            Effect: Allow
+              - arn:aws:s3:::packt-serverless-etl-glue
+              - arn:aws:s3:::packt-serverless-etl-glue/HandsonSeriesWithAWSGlue/*
+          - Effect: Allow
             Action:
               - kms:Encrypt
               - kms:Decrypt
@@ -673,7 +631,7 @@ Resources:
               - kms:GenerateDataKeyPairWithoutPlaintext
               - kms:GenerateDataKeyPair
               - kms:DescribeKey
-            Resource: '*'                 
+            Resource: '*'
       Roles:
         - HandsonSeriesWithAWSGlueExecuteLambdaFnsRole
 
@@ -691,13 +649,11 @@ Resources:
           import boto3
           import json
           import urllib3
-          
           glue = boto3.client('glue')
           s3 = boto3.resource('s3')
           ec2 = boto3.client('ec2')
           s3_client = boto3.client('s3')
           http = urllib3.PoolManager()
-
           def lambda_handler(event, context):
             print('Event: %s' % json.dumps(event))
             response = { 'StackId': event['StackId'], 'RequestId': event['RequestId'], 'LogicalResourceId': event['LogicalResourceId'] }
@@ -721,17 +677,17 @@ Resources:
                       glue.batch_stop_job_run(JobName='09 - Kafka Consumer for Data Analysis Chapter',JobRunIds=[streaming_job_run['Id']])
                   except Exception as e:
                     if e.response['Error']['Code'] == 'EntityNotFoundException':
-                      pass                      
+                      pass
                   try:
                     streaming_job_run = glue.get_job_runs(JobName='10 - DeltaStreamer Kafka Consumer for Data Analysis Chapter',MaxResults=1)['JobRuns'][0]
                     if streaming_job_run['JobRunState'] == 'RUNNING':
                       glue.batch_stop_job_run(JobName='10 - DeltaStreamer Kafka Consumer for Data Analysis Chapter',JobRunIds=[streaming_job_run['Id']])
                   except Exception as e:
                     if e.response['Error']['Code'] == 'EntityNotFoundException':
-                      pass 
+                      pass
                   enis = ec2.describe_network_interfaces(Filters=[{'Name':'description','Values':['Attached to Glue using role: arn:aws:iam::'+resProps['Account']+':role/HandsonSeriesWithAWSGlueJobRole']}])['NetworkInterfaces']
                   eni_ids = [i['NetworkInterfaceId'] for i in enis]
-                  attachment_ids = [i['Attachment']['AttachmentId'] for i in enis if 'Attachment' in i] 
+                  attachment_ids = [i['Attachment']['AttachmentId'] for i in enis if 'Attachment' in i]
                   print('Detaching ENIs section started.')
                   for i in attachment_ids:
                     try:
@@ -752,7 +708,7 @@ Resources:
                         pass
                       else:
                         response.update({ 'Status': 'FAILED', 'Reason': str(e), 'PhysicalResourceId': 'InitSetupDeleteFailed' })
-                  print('Deleting ENIs section completed.')                        
+                  print('Deleting ENIs section completed.')
                 except Exception as e:
                   response.update({ 'Status': 'FAILED', 'Reason': str(e), 'PhysicalResourceId': 'InitSetupDeleteFailed' })
                 response.update({ 'Status': 'SUCCESS', 'PhysicalResourceId': 'InitSetupDelete' })
@@ -770,10 +726,9 @@ Resources:
       Description: Lambda function for starter tasks.
       Handler: index.lambda_handler
       Role: !GetAtt ExecuteLambdaFnsRole.Arn
-      Timeout: 900      
+      Timeout: 900
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ExecuteStarterTasks:
@@ -800,16 +755,15 @@ Resources:
       SecurityGroupIds:
         - !GetAtt ChapterDataAnalysisSecurityGroup.GroupId
       SubnetId: !Ref PublicSubnet
-      BlockDeviceMappings: 
-      - DeviceName: /dev/sda1
-        Ebs:
-          Encrypted: false
-          VolumeType: gp2
-          DeleteOnTermination: true
-          VolumeSize: 30
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            Encrypted: false
+            VolumeType: gp3
+            DeleteOnTermination: true
+            VolumeSize: 30
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   GluePrivateResourcesConnection:
@@ -817,9 +771,9 @@ Resources:
     DependsOn:
       - ChapterDataAnalysisSecurityGroup
       - PrivateSubnet1
-    Properties: 
+    Properties:
       CatalogId: !Ref AWS::AccountId
-      ConnectionInput: 
+      ConnectionInput:
         ConnectionType: NETWORK
         Description: Connection to access the kafka topic and Opensearch from Glue job.
         Name: private_resources_network_connection
@@ -829,14 +783,27 @@ Resources:
           SubnetId: !Ref PrivateSubnet1
           AvailabilityZone: !GetAtt PrivateSubnet1.AvailabilityZone
 
+  GlueOpenSearchConnection:
+    Type: AWS::Glue::Connection
+    DependsOn:
+      - OpenSearchDomain
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      ConnectionInput:
+        ConnectionProperties:
+          SparkProperties: !Ref '{"secretId":"ChapterDataAnalysisOSSecret","opensearch.nodes":"${OpenSearchDomain.DomainEndpoint}","opensearch.port":"443","opensearch.aws.sig4.region":"${AWS::Region}","opensearch.nodes.wan.only":"false","opensearch.aws.sigv4.enabled":"false"}'
+        ConnectionType: OPENSEARCH
+        Description: Connection to access to the OpenSearch domain from Glue job.
+        Name: opensearch-connection
+
   ChapterDataAnalysisGlueDatabase:
     Type: AWS::Glue::Database
-    Properties: 
+    Properties:
       CatalogId: !Ref AWS::AccountId
-      DatabaseInput: 
+      DatabaseInput:
         Description: All tables in this chapter will be created within this database.
         Name: chapter_data_analysis_glue_database
-        LocationUri: !Join ['', ["s3://", !Ref TargetS3Bucket, "/"]]
+        LocationUri: !Sub s3://${TargetS3Bucket}/
 
   DeltaStreamerStreamingJob:
     Type: AWS::Glue::Job
@@ -851,27 +818,27 @@ Resources:
       Description: This job acts as a deltastreamer consumer of the kafka topic.
       Command:
         Name: gluestreaming
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/DeltaStreamer Kafka Consumer for Data Analysis Chapter.scala"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/DeltaStreamer Kafka Consumer for Data Analysis Chapter.scala
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/DeltaStreamerKafkaConsumerForDataAnalysisChapter"]]
-        '--job-language': 'scala'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/DeltaStreamerKafkaConsumerForDataAnalysisChapter
+        '--job-language': scala
         '--TARGET_BUCKET': !Ref TargetS3Bucket
         '--CONFIG_BUCKET': !Ref ScriptAndTempS3Bucket
         '--job-bookmark-option': job-bookmark-disable
-        '--class': 'GlueApp'
-        '--extra-jars': '/tmp/*'
-        '--datalake-formats': 'hudi'
+        '--class': GlueApp
+        '--extra-jars': /tmp/*
+        '--datalake-formats': hudi
       MaxRetries: 0
       Name: 10 - DeltaStreamer Kafka Consumer for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
@@ -893,24 +860,24 @@ Resources:
       Description: This job acts as a consumer of the kafka topic.
       Command:
         Name: gluestreaming
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Kafka Consumer for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/Kafka Consumer for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/KafkaConsumerForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/KafkaConsumerForDataAnalysisChapter
+        '--job-language': python
         '--TARGET_BUCKET': !Ref TargetS3Bucket
         '--job-bookmark-option': job-bookmark-disable
-        '--datalake-formats': 'hudi'
+        '--datalake-formats': hudi
       MaxRetries: 0
       Name: 09 - Kafka Consumer for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
@@ -929,23 +896,23 @@ Resources:
       Description: This job creates seed data that will be used in the rest of the chapter.
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Seed data job for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/Seed data job for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/SeedDataJobForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/SeedDataJobForDataAnalysisChapter
+        '--job-language': python
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
       MaxRetries: 0
       Name: 01 - Seed data job for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Tags:
@@ -961,24 +928,24 @@ Resources:
       Description: This job processes incremental data for DeltaLake table.
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/DeltaLake Incremental load for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/DeltaLake Incremental load for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/DeltaLakeIncrementalLoadForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/DeltaLakeIncrementalLoadForDataAnalysisChapter
+        '--job-language': python
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
-        '--datalake-formats': 'delta'
+        '--datalake-formats': delta
       MaxRetries: 0
       Name: 05 - DeltaLake Incremental load for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Tags:
@@ -994,24 +961,24 @@ Resources:
       Description: This job processes initial load data for DeltaLake table.
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/DeltaLake Init load for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/DeltaLake Init load for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/DeltaLakeInitLoadForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/DeltaLakeInitLoadForDataAnalysisChapter
+        '--job-language': python
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
-        '--datalake-formats': 'delta'
+        '--datalake-formats': delta
       MaxRetries: 0
       Name: 04 - DeltaLake Init load for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Tags:
@@ -1027,24 +994,24 @@ Resources:
       Description: This job processes incremental load data for Hudi table.
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Hudi Incremental load for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/Hudi Incremental load for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/HudiIncrementalLoadForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/HudiIncrementalLoadForDataAnalysisChapter
+        '--job-language': python
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
-        '--datalake-formats': 'hudi'
+        '--datalake-formats': hudi
       MaxRetries: 0
       Name: 03 - Hudi Incremental load for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Tags:
@@ -1060,24 +1027,24 @@ Resources:
       Description: This job processes initial load data for Hudi table.
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Hudi Init load for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/Hudi Init load for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/HudiInitLoadForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/HudiInitLoadForDataAnalysisChapter
+        '--job-language': python
         '--job-bookmark-option': job-bookmark-disable
         '--TARGET_BUCKET': !Ref TargetS3Bucket
-        '--datalake-formats': 'hudi'
+        '--datalake-formats': hudi
       MaxRetries: 0
       Name: 02 - Hudi Init load for Data Analysis Chapter
-      GlueVersion: 4.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Tags:
@@ -1094,19 +1061,18 @@ Resources:
       Description: This job will load the initial data in a Kafka topic.
       Command:
         Name: pythonshell
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Kafka Producer for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/Kafka Producer for Data Analysis Chapter.py
+        PythonVersion: '3.9'
       DefaultArguments:
-        '--extra-py-files': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/dependencies/kafka_python-2.0.2-py2.py3-none-any.whl,s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/dependencies/awswrangler-2.14.0-py3-none-any.whl"]]
+        '--extra-py-files': !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/dependencies/kafka_python-2.0.2-py2.py3-none-any.whl,s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/dependencies/awswrangler-2.14.0-py3-none-any.whl
         '--job-bookmark-option': job-bookmark-disable
-        '--job-language': 'python'
+        '--job-language': python
         '--TARGET_BUCKET': !Ref TargetS3Bucket
       MaxRetries: 0
       Name: 08 - Kafka Producer for Data Analysis Chapter
-      GlueVersion: 1.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
       MaxCapacity: 0.0625
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
@@ -1126,18 +1092,17 @@ Resources:
       Description: This job will load the incremental data in a Kafka topic.
       Command:
         Name: pythonshell
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/Incremental Data Kafka Producer for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/Incremental Data Kafka Producer for Data Analysis Chapter.py
+        PythonVersion: '3.9'
       DefaultArguments:
-        '--extra-py-files': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/dependencies/kafka_python-2.0.2-py2.py3-none-any.whl,s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/dependencies/awswrangler-2.14.0-py3-none-any.whl"]]
+        '--extra-py-files': !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/dependencies/kafka_python-2.0.2-py2.py3-none-any.whl,s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/dependencies/awswrangler-2.14.0-py3-none-any.whl
         '--job-bookmark-option': job-bookmark-disable
-        '--job-language': 'python'
+        '--job-language': python
       MaxRetries: 0
       Name: 11 - Incremental Data Kafka Producer for Data Analysis Chapter
-      GlueVersion: 1.0
       Role: !GetAtt ExecuteGlueJobRole.Arn
       MaxCapacity: 0.0625
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
@@ -1153,32 +1118,31 @@ Resources:
       - ExecuteGlueJobRole
       - ReqdForGlueJobsToExecute
       - OpensearchDomain
+      - GluePrivateResourcesConnection
     Properties:
       Description: This job loads the data into Opensearch domain.
       Command:
         Name: glueetl
-        ScriptLocation: !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/HandsonSeriesWithAWSGlue/scripts/OpenSearch Load for Data Analysis Chapter.py"]]
-        PythonVersion: 3
+        ScriptLocation: !Sub s3://${ScriptAndTempS3Bucket}/HandsonSeriesWithAWSGlue/scripts/OpenSearch Load for Data Analysis Chapter.py
+        PythonVersion: '3'
       DefaultArguments:
         '--enable-glue-datacatalog': ''
         '--enable-continuous-cloudwatch-log': 'true'
         '--enable-metrics': ''
-        '--TempDir': !Join ['', ["s3://", !Ref ScriptAndTempS3Bucket, "/temp/OpenSearchLoadForDataAnalysisChapter"]]
-        '--job-language': 'python'
+        '--TempDir': !Sub s3://${ScriptAndTempS3Bucket}/temp/OpenSearchLoadForDataAnalysisChapter
+        '--job-language': python
         '--job-bookmark-option': job-bookmark-disable
-        '--DOMAIN_ENDPOINT': !GetAtt OpensearchDomain.DomainEndpoint
       MaxRetries: 0
       Name: 12 - OpenSearch Load for Data Analysis Chapter
-      GlueVersion: 3.0
+      GlueVersion: '4.0'
       Role: !GetAtt ExecuteGlueJobRole.Arn
-      WorkerType: 'G.1X'
+      WorkerType: G.1X
       NumberOfWorkers: 2
-      Timeout: 2880
+      Timeout: 60
       ExecutionProperty:
         MaxConcurrentRuns: 1
       Connections:
         Connections:
-          - !Ref OpenSearchConnectionName
           - !Ref GluePrivateResourcesConnection
       Tags:
         Project: HandsonSeriesWithAWSGlue
@@ -1192,7 +1156,7 @@ Resources:
       - ExecuteStarterTasks
     Properties:
       ClusterName: !Sub msk-source-cluster-${AWS::StackName}
-      KafkaVersion: 2.6.2
+      KafkaVersion: 3.5.1
       NumberOfBrokerNodes: 2
       EncryptionInfo:
         EncryptionAtRest:
@@ -1221,14 +1185,13 @@ Resources:
   KMSEncryptionKey:
     Type: AWS::KMS::Key
     DependsOn: LFServiceLinkedRole
-    Properties: 
+    Properties:
       Description: Key to encrypt resources.
       Enabled: true
-      KeyPolicy: 
+      KeyPolicy:
         Version: 2012-10-17
         Statement:
-          - 
-            Sid: Enable IAM User Permissions
+          - Sid: Enable IAM User Permissions
             Effect: Allow
             Principal:
               AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
@@ -1239,13 +1202,12 @@ Resources:
                 - redshift.amazonaws.com
                 - secretsmanager.amazonaws.com
                 - lambda.amazonaws.com
-            Action: 
+            Action:
               - kms:*
             Resource: '*'
-          - 
-            Sid: Allow use of the key
+          - Sid: Allow use of the key
             Effect: Allow
-            Principal: 
+            Principal:
               AWS:
                 - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess
                 - !GetAtt RSAccessRole.Arn
@@ -1258,10 +1220,9 @@ Resources:
               - kms:GenerateDataKeyPairWithoutPlaintext
               - kms:GenerateDataKeyPair
               - kms:DescribeKey
-            Resource: '*'            
+            Resource: '*'
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   KMSEncryptionKeyAlias:
@@ -1271,70 +1232,69 @@ Resources:
       AliasName: alias/resource-encryption-key
       TargetKeyId: !Ref KMSEncryptionKey
 
-  OSApplicationLogs: 
+  OSApplicationLogs:
     Type: AWS::Logs::LogGroup
     DependsOn: KMSEncryptionKey
-    Properties: 
+    Properties:
       RetentionInDays: 7
       LogGroupName: !Sub /aws/opensearch/domains/data-analysis-os-domain/application-logs
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
-  OSIndexLogs: 
+  OSIndexLogs:
     Type: AWS::Logs::LogGroup
     DependsOn: KMSEncryptionKey
-    Properties: 
+    Properties:
       RetentionInDays: 7
       LogGroupName: !Sub /aws/opensearch/domains/data-analysis-os-domain/index-logs
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
-  OSSearchLogs: 
+  OSSearchLogs:
     Type: AWS::Logs::LogGroup
     DependsOn: KMSEncryptionKey
-    Properties: 
+    Properties:
       RetentionInDays: 7
       LogGroupName: !Sub /aws/opensearch/domains/data-analysis-os-domain/search-logs
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
-  OSAuditLogs: 
+  OSAuditLogs:
     Type: AWS::Logs::LogGroup
     DependsOn: KMSEncryptionKey
-    Properties: 
+    Properties:
       RetentionInDays: 7
       LogGroupName: !Sub /aws/opensearch/domains/data-analysis-os-domain/audit-logs
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   OpensearchServiceLinkedRole:
     Type: AWS::IAM::ServiceLinkedRole
-    Properties: 
+    Properties:
       AWSServiceName: opensearchservice.amazonaws.com
-      Description: This service linked role is required to successfully create the opensearch domain. Read here for more - https://docs.aws.amazon.com/opensearch-service/latest/developerguide/slr.html
+      Description: This service linked role is required to successfully create the
+        opensearch domain. Read here for more -
+        https://docs.aws.amazon.com/opensearch-service/latest/developerguide/slr.html
 
   OpensearchLogsResourcePolicy:
     Type: AWS::Logs::ResourcePolicy
     Properties:
-      PolicyName: "OpenSearchServiceLogsResourcePolicy"
-      PolicyDocument: '{"Version": "2012-10-17","Statement":[{"Effect":"Allow","Principal": {"Service": ["es.amazonaws.com"]},"Action":["logs:PutLogEvents","logs:CreateLogStream"],"Resource":"*"}]}'
-
+      PolicyName: OpenSearchServiceLogsResourcePolicy
+      PolicyDocument: '{"Version":
+        "2012-10-17","Statement":[{"Effect":"Allow","Principal": {"Service":
+        ["es.amazonaws.com"]},"Action":["logs:PutLogEvents","logs:CreateLogStream"],"Resource":"*"}]}'
 
   OpensearchDomain:
     Type: AWS::OpenSearchService::Domain
-    DependsOn: 
+    DependsOn:
       - KMSEncryptionKey
       - OSApplicationLogs
       - OSIndexLogs
@@ -1348,7 +1308,7 @@ Resources:
       - ExecuteStarterTasks
     Properties:
       DomainName: !Sub data-analysis-os-domain
-      EngineVersion: OpenSearch_1.2
+      EngineVersion: OpenSearch_2.13
       DomainEndpointOptions:
         EnforceHTTPS: true
         TLSSecurityPolicy: Policy-Min-TLS-1-2-2019-07
@@ -1387,96 +1347,92 @@ Resources:
         EBSEnabled: true
         Iops: 0
         VolumeSize: 100
-        VolumeType: gp2
+        VolumeType: gp3
       SnapshotOptions: {}
       Tags:
-       -
-        Key: Project
-        Value: HandsonSeriesWithAWSGlue      
+        - Key: Project
+          Value: HandsonSeriesWithAWSGlue
       VPCOptions:
         SecurityGroupIds:
-          - Ref: ChapterDataAnalysisSecurityGroup
+          - !Ref ChapterDataAnalysisSecurityGroup
         SubnetIds:
-          - Ref: PrivateSubnet1
-          - Ref: PrivateSubnet2
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
       AccessPolicies:
         Version: 2012-10-17
         Statement:
-          -
-            Effect: "Allow"
+          - Effect: Allow
             Principal:
               AWS: '*'
             Action:
               - es:*
             Resource: !Sub arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/data-analysis-os-domain/*
-          -
-            Effect: "Allow"
+          - Effect: Allow
             Principal:
               AWS: '*'
             Action:
               - logs:PutLogEvents
               - logs:CreateLogStream
             Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/opensearch/domains/data-analysis-os-domain/*
-            Resource: '*'
       AdvancedOptions:
         rest.action.multi.allow_explicit_index: true
 
   ChapterDataAnalysisRedshiftClusterSubnetGroup:
     Type: AWS::Redshift::ClusterSubnetGroup
-    DependsOn: 
+    DependsOn:
       - PrivateSubnet1
       - PrivateSubnet2
-    Properties: 
-      Description: The subnet group to be associated with the Redshift cluster for the Data Analysis chapter.
-      SubnetIds: 
+    Properties:
+      Description: The subnet group to be associated with the Redshift cluster for the
+        Data Analysis chapter.
+      SubnetIds:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ChapterDataAnalysisRedshiftCluster:
     Type: AWS::Redshift::Cluster
-    DependsOn: 
+    DependsOn:
       - KMSEncryptionKey
       - ChapterDataAnalysisSecurityGroup
       - ChapterDataAnalysisRedshiftClusterSubnetGroup
       - RSAccessRole
       - ExecuteStarterTasks
-    Properties: 
+    Properties:
       AllowVersionUpgrade: false
       AquaConfigurationStatus: auto
-      VpcSecurityGroupIds: 
+      VpcSecurityGroupIds:
         - !GetAtt ChapterDataAnalysisSecurityGroup.GroupId
       ClusterSubnetGroupName: !Ref ChapterDataAnalysisRedshiftClusterSubnetGroup
       ClusterType: single-node
-      ClusterVersion: 1.0
+      ClusterVersion: '1.0'
       DBName: dev
       Encrypted: true
       EnhancedVpcRouting: true
-      IamRoles: 
+      IamRoles:
         - !GetAtt RSAccessRole.Arn
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
       MasterUsername: !Ref RedshiftMasterUserName
       MasterUserPassword: !Ref RedshiftMasterUserPassword
-      NodeType: dc2.large
+      NodeType: ra3.xlplus
       PubliclyAccessible: false
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
   ChapterDataAnalysisOpenSearchDomainSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: ChapterDataAnalysisOSSecret
-      Description: This is the username and password of the master user of OpenSearch domain created for Data Analysis chapter.
+      Description: This is the username and password of the master user of OpenSearch
+        domain created for Data Analysis chapter.
       KmsKeyId: !GetAtt KMSEncryptionKey.Arn
-      SecretString: !Sub '{"es.net.http.auth.user": "${OpenSearchMasterUserName}", "es.net.http.auth.pass": "${OpenSearchMasterUserPassword}"}'
+      SecretString: !Sub '{"es.net.http.auth.user": "${OpenSearchMasterUserName}",
+        "es.net.http.auth.pass": "${OpenSearchMasterUserPassword}"}'
       Tags:
-        -
-          Key: Project
+        - Key: Project
           Value: HandsonSeriesWithAWSGlue
 
 Outputs:
@@ -1485,7 +1441,8 @@ Outputs:
     Value: !GetAtt EC2InstanceForRDP.PublicIp
 
   InstanceIDOfEC2InstanceForRDP:
-    Description: Instance ID of the EC2 instance that will be used for OpenSearch dashboards.
+    Description: Instance ID of the EC2 instance that will be used for OpenSearch
+      dashboards.
     Value: !Ref EC2InstanceForRDP
 
   TargetS3Bucket:
@@ -1501,21 +1458,25 @@ Outputs:
     Value: !Ref VPC
 
   PrivateSubnet1Id:
-    Description: The PrivateSubnet1 to be used while creating the Glue MSK Connection and Serverless Redshift.
+    Description: The PrivateSubnet1 to be used while creating the Glue MSK
+      Connection and Serverless Redshift.
     Value: !Ref PrivateSubnet1
 
   PrivateSubnet2Id:
-    Description: The PrivateSubnet2 to be used while creating the Glue MSK Connection and Serverless Redshift.
+    Description: The PrivateSubnet2 to be used while creating the Glue MSK
+      Connection and Serverless Redshift.
     Value: !Ref PrivateSubnet2
 
   ChapterDataAnalysisSecurityGroup:
-    Description: The Security Group Id to be used while creating the Glue MSK Connection and Serverless Redshift.
+    Description: The Security Group Id to be used while creating the Glue MSK
+      Connection and Serverless Redshift.
     Value: !Ref ChapterDataAnalysisSecurityGroup
 
   RedshiftClusterId:
-    Description: The id of the Redshift cluster. This will be required to select the correct cluster to connect.
+    Description: The id of the Redshift cluster. This will be required to select the
+      correct cluster to connect.
     Value: !Ref ChapterDataAnalysisRedshiftCluster
 
   OpenSearchDashboardsURL:
     Description: The URL to be used in your EC2 instance to open the OpenSearch Dashboards.
-    Value: !Join ['', ["https://", !GetAtt OpensearchDomain.DomainEndpoint, "/_dashboards"]]
+    Value: !Sub https://${OpensearchDomain.DomainEndpoint}/_dashboards
